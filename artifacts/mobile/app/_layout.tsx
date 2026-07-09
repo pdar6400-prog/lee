@@ -35,13 +35,22 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
+  // Force-show app after 3s even if fonts fail (e.g. captive portal blocks CDN)
+  const [timedOut, setTimedOut] = React.useState(false);
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    const t = setTimeout(() => setTimedOut(true), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const ready = fontsLoaded || fontError || timedOut;
+
+  useEffect(() => {
+    if (ready) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [ready]);
 
-  if (!fontsLoaded && !fontError) return null;
+  if (!ready) return null;
 
   return (
     <SafeAreaProvider>
