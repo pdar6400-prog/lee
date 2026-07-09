@@ -16,7 +16,13 @@
     "ios": {
       "supportsTablet": false
     },
-    "android": {},
+    "android": {
+      "package": "com.star.wifiportal",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#070b14"
+      }
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
