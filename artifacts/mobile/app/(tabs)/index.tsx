@@ -31,6 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { WebView } from 'react-native-webview';
+import { router } from 'expo-router';
 
 // ─── Portal URL Template ───────────────────────────────────────────────────
 // mac, gw_address, nasip, ip ကို auto-detected values နဲ့ replace မည်
@@ -251,6 +252,24 @@ export default function HomeScreen() {
   const [webViewKey, setWebViewKey] = useState(0);
   const urlIndexRef = useRef(0);
 
+  // ── Secret admin tap ──
+  const adminTapCount = useRef(0);
+  const adminTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleLogoTap() {
+    adminTapCount.current += 1;
+    if (adminTapTimer.current) clearTimeout(adminTapTimer.current);
+    if (adminTapCount.current >= 5) {
+      adminTapCount.current = 0;
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.push('/admin');
+    } else {
+      adminTapTimer.current = setTimeout(() => {
+        adminTapCount.current = 0;
+      }, 2000);
+    }
+  }
+
   // ── Animations ──
   const pulseAnim = useSharedValue(1);
   useEffect(() => {
@@ -447,19 +466,21 @@ export default function HomeScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* ── LOGO ── */}
+        {/* ── LOGO (tap 5x to open admin) ── */}
         <Animated.View entering={FadeIn.duration(600)} style={styles.logoSection}>
-          <Animated.View style={logoStyle}>
-            <LinearGradient
-              colors={['#00b4ff22', '#00b4ff08', 'transparent']}
-              style={styles.logoGlow}
-            />
-            <View style={styles.logoRow}>
-              <MaterialCommunityIcons name="wifi" size={32} color="#00b4ff" />
-              <Text style={styles.logoText}>STAR</Text>
-              <MaterialCommunityIcons name="wifi" size={32} color="#00b4ff" />
-            </View>
-          </Animated.View>
+          <TouchableOpacity onPress={handleLogoTap} activeOpacity={1}>
+            <Animated.View style={logoStyle}>
+              <LinearGradient
+                colors={['#00b4ff22', '#00b4ff08', 'transparent']}
+                style={styles.logoGlow}
+              />
+              <View style={styles.logoRow}>
+                <MaterialCommunityIcons name="wifi" size={32} color="#00b4ff" />
+                <Text style={styles.logoText}>STAR</Text>
+                <MaterialCommunityIcons name="wifi" size={32} color="#00b4ff" />
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
           <Text style={styles.logoSub}>Ruijie Network Portal Tool</Text>
         </Animated.View>
 
